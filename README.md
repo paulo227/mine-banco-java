@@ -1,3 +1,4 @@
+
 # MineBanco 🏦
 
 Sistema bancário em **Java 11 + Spring Boot 2.7 + PostgreSQL + Angular 17**.
@@ -36,3 +37,5 @@ frontend/src/app/  → Frontend (Angular: layout, páginas, services, models)
 
 **Backend:** Java 11, Spring Boot 2.7, PostgreSQL, HikariCP, Maven  
 **Frontend:** Angular 17, Angular Material, CSS Grid/Flexbox, responsivo
+# mine-banco-java
+Banking System • Java • PostgreSQL • Angular • Full Stack
