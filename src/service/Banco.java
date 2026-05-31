@@ -3,6 +3,7 @@ package service;
 import model.Conta;
 import model.ContaPoupanca;
 import model.Tributavel;
+import org.springframework.stereotype.Service;
 import util.ContaDAO;
 import util.Notificador;
 import util.NotificadorConsole;
@@ -10,10 +11,21 @@ import util.NotificadorConsole;
 import java.sql.SQLException;
 import java.util.List;
 
+@Service
 public class Banco {
 
-    private final ContaDAO contaDAO = new ContaDAO();
-    private Notificador notificador = new NotificadorConsole();
+    private final ContaDAO contaDAO;
+    private Notificador notificador;
+
+    public Banco(ContaDAO contaDAO) {
+        this.contaDAO = contaDAO;
+        this.notificador = new NotificadorConsole();
+    }
+
+    public Banco() {
+        this.contaDAO = new ContaDAO();
+        this.notificador = new NotificadorConsole();
+    }
 
     public void setNotificador(Notificador notificador) {
         this.notificador = notificador;

@@ -20,8 +20,13 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class ContaController {
 
-    private final Banco banco = new Banco();
-    private final ContaDAO contaDAO = new ContaDAO();
+    private final Banco banco;
+    private final ContaDAO contaDAO;
+
+    public ContaController(Banco banco, ContaDAO contaDAO) {
+        this.banco = banco;
+        this.contaDAO = contaDAO;
+    }
 
     @PostMapping
     public ResponseEntity<?> criarConta(@RequestBody CriarContaRequest req) {
