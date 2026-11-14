@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
@@ -12,120 +11,221 @@ import { ContaService } from '../services/conta.service';
 @Component({
   selector: 'app-operacoes',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatCardModule, MatIconModule, MatSnackBarModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatSnackBarModule
+  ],
   template: `
-    <h2>Operações</h2>
+    <div class="page">
+      <header class="page-header">
+        <div>
+          <h1 class="page-title">Operações</h1>
+          <p class="page-subtitle">Deposite, saque e transfira valores entre contas.</p>
+        </div>
+      </header>
 
-    <div class="op-grid">
-      <mat-card appearance="outlined" class="op-card">
-        <mat-card-header>
-          <mat-icon mat-card-avatar>payments</mat-icon>
-          <mat-card-title>Depositar</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <form [formGroup]="formDeposito" (ngSubmit)="onDepositar()">
+      <div class="op-grid">
+        <section class="op-card surface-card" aria-labelledby="deposito-title">
+          <div class="op-card-header">
+            <span class="op-icon deposit" aria-hidden="true">
+              <mat-icon aria-hidden="true">payments</mat-icon>
+            </span>
+            <div class="op-title-wrap">
+              <h2 id="deposito-title">Depositar</h2>
+              <p class="op-desc">Adicione fundos a uma conta.</p>
+            </div>
+          </div>
+
+          <form [formGroup]="formDeposito" (ngSubmit)="onDepositar()" novalidate>
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Número da Conta</mat-label>
-              <input matInput type="number" formControlName="numero" required>
+              <mat-label>Número da conta</mat-label>
+              <input matInput type="number" formControlName="numero" inputmode="numeric" min="1" required>
             </mat-form-field>
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Valor</mat-label>
-              <input matInput type="number" formControlName="valor" step="0.01" required>
+              <span matPrefix>R$&nbsp;</span>
+              <input matInput type="number" formControlName="valor" step="0.01" min="0.01" inputmode="decimal" required>
             </mat-form-field>
-            <button mat-raised-button color="primary" type="submit" [disabled]="formDeposito.invalid || loadingDep">
+            <button mat-flat-button color="primary" type="submit" class="submit-btn" [disabled]="formDeposito.invalid || loadingDep">
               {{ loadingDep ? 'Depositando...' : 'Depositar' }}
             </button>
           </form>
-        </mat-card-content>
-      </mat-card>
+        </section>
 
-      <mat-card appearance="outlined" class="op-card">
-        <mat-card-header>
-          <mat-icon mat-card-avatar>money_off</mat-icon>
-          <mat-card-title>Sacar</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <form [formGroup]="formSaque" (ngSubmit)="onSacar()">
+        <section class="op-card surface-card" aria-labelledby="saque-title">
+          <div class="op-card-header">
+            <span class="op-icon withdraw" aria-hidden="true">
+              <mat-icon aria-hidden="true">money_off</mat-icon>
+            </span>
+            <div class="op-title-wrap">
+              <h2 id="saque-title">Sacar</h2>
+              <p class="op-desc">Retire valores de uma conta.</p>
+            </div>
+          </div>
+
+          <form [formGroup]="formSaque" (ngSubmit)="onSacar()" novalidate>
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Número da Conta</mat-label>
-              <input matInput type="number" formControlName="numero" required>
+              <mat-label>Número da conta</mat-label>
+              <input matInput type="number" formControlName="numero" inputmode="numeric" min="1" required>
             </mat-form-field>
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Valor</mat-label>
-              <input matInput type="number" formControlName="valor" step="0.01" required>
+              <span matPrefix>R$&nbsp;</span>
+              <input matInput type="number" formControlName="valor" step="0.01" min="0.01" inputmode="decimal" required>
             </mat-form-field>
-            <button mat-raised-button color="warn" type="submit" [disabled]="formSaque.invalid || loadingSaq">
+            <button mat-flat-button color="warn" type="submit" class="submit-btn" [disabled]="formSaque.invalid || loadingSaq">
               {{ loadingSaq ? 'Sacando...' : 'Sacar' }}
             </button>
           </form>
-        </mat-card-content>
-      </mat-card>
+        </section>
 
-      <mat-card appearance="outlined" class="op-card op-card-wide">
-        <mat-card-header>
-          <mat-icon mat-card-avatar>swap_horiz</mat-icon>
-          <mat-card-title>Transferir</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <form [formGroup]="formTransferencia" (ngSubmit)="onTransferir()">
+        <section class="op-card op-card-wide surface-card" aria-labelledby="transferencia-title">
+          <div class="op-card-header">
+            <span class="op-icon transfer" aria-hidden="true">
+              <mat-icon aria-hidden="true">swap_horiz</mat-icon>
+            </span>
+            <div class="op-title-wrap">
+              <h2 id="transferencia-title">Transferir</h2>
+              <p class="op-desc">Mova valores entre duas contas.</p>
+            </div>
+          </div>
+
+          <form [formGroup]="formTransferencia" (ngSubmit)="onTransferir()" novalidate>
             <div class="transfer-fields">
               <mat-form-field appearance="outline">
-                <mat-label>Conta Origem</mat-label>
-                <input matInput type="number" formControlName="origem" required>
+                <mat-label>Conta de origem</mat-label>
+                <input matInput type="number" formControlName="origem" inputmode="numeric" min="1" required>
               </mat-form-field>
-              <mat-icon class="arrow">arrow_forward</mat-icon>
+              <mat-icon class="arrow" aria-hidden="true">arrow_forward</mat-icon>
               <mat-form-field appearance="outline">
-                <mat-label>Conta Destino</mat-label>
-                <input matInput type="number" formControlName="destino" required>
+                <mat-label>Conta de destino</mat-label>
+                <input matInput type="number" formControlName="destino" inputmode="numeric" min="1" required>
               </mat-form-field>
             </div>
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Valor</mat-label>
-              <input matInput type="number" formControlName="valor" step="0.01" required>
+              <span matPrefix>R$&nbsp;</span>
+              <input matInput type="number" formControlName="valor" step="0.01" min="0.01" inputmode="decimal" required>
             </mat-form-field>
-            <button mat-raised-button color="primary" type="submit" [disabled]="formTransferencia.invalid || loadingTransf">
+            <button mat-flat-button color="primary" type="submit" class="submit-btn" [disabled]="formTransferencia.invalid || loadingTransf">
               {{ loadingTransf ? 'Transferindo...' : 'Transferir' }}
             </button>
           </form>
-        </mat-card-content>
-      </mat-card>
+        </section>
+      </div>
     </div>
   `,
   styles: [`
-    h2 {
-      margin: 0 0 20px;
-      color: #3f51b5;
-      font-weight: 500;
-    }
-
     .op-grid {
       display: grid;
       gap: 20px;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+
+    .op-card {
+      padding: 22px;
     }
 
     .op-card-wide {
       grid-column: 1 / -1;
     }
 
+    .op-card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .op-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .op-icon mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+
+    .op-icon.deposit {
+      background: var(--success-soft);
+      color: var(--success-text);
+    }
+
+    .op-icon.withdraw {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .op-icon.transfer {
+      background: var(--primary-soft);
+      color: var(--primary);
+    }
+
+    .op-title-wrap h2 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 650;
+      color: var(--text-primary);
+    }
+
+    .op-desc {
+      margin: 2px 0 0;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
     .full-width {
       width: 100%;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
     }
 
     .transfer-fields {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-    }
-
-    .transfer-fields mat-form-field {
-      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 12px;
+      align-items: start;
     }
 
     .arrow {
-      margin-top: 20px;
-      color: #3f51b5;
+      margin-top: 18px;
+      color: var(--text-secondary);
+    }
+
+    .submit-btn {
+      min-height: 44px;
+      padding: 0 24px;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 640px) {
+      .op-card {
+        padding: 18px;
+      }
+
+      .transfer-fields {
+        grid-template-columns: 1fr;
+      }
+
+      .arrow {
+        margin: 0 auto;
+        transform: rotate(90deg);
+      }
+
+      .submit-btn {
+        width: 100%;
+      }
     }
   `]
 })

@@ -1,37 +1,39 @@
-### IntelliJ IDEA ###
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
+# ============================================================
+# MineBanco - arquivos ignorados pelo Git
+# ============================================================
 
-### Eclipse ###
-.apt_generated
+### Maven / build do backend ###
+target/
+out/
+*.class
+
+### Build do frontend (gerado pelo Angular) ###
+frontend/node_modules/
+frontend/dist/
+frontend/tmp/
+frontend/.angular/
+src/main/resources/static/
+
+### Artefatos extraídos de dependências ###
+/META-INF/
+
+### Logs e arquivos temporários ###
+*.log
+*.pid
+*.tmp
+
+### IDE / editores ###
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
 .classpath
 .factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-
-### VS Code ###
-.vscode/
-
-### Mac OS ###
+### SO ###
 .DS_Store
+Thumbs.db
 
 ### PostgreSQL JDBC ###
 lib/*.jar
-
-### Angular frontend build output ###
-src/main/resources/static/*.js
-src/main/resources/static/*.css
-src/main/resources/static/3rdpartylicenses.txt

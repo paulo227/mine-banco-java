@@ -1,36 +1,50 @@
 package model;
 
+import exception.SaldoInsuficienteException;
+
+/**
+ * Conta Poupança: não possui limite de crédito, não paga imposto.
+ * Suporta aplicação de rendimento sobre o saldo.
+ */
 public class ContaPoupanca extends Conta {
 
     public ContaPoupanca(int numeroConta, Cliente cliente) {
         super(numeroConta, cliente);
     }
 
+    /**
+     * Realiza saque — não permite saldo negativo.
+     *
+     * @param valor valor a sacar
+     * @throws SaldoInsuficienteException se o saldo for insuficiente
+     */
     @Override
     public void sacar(double valor) {
-        if (valor <= saldo) {
-            saldo -= valor;
-            System.out.println("Saque realizado.");
-            System.out.println("Saldo atual: R$ " + saldo);
-        } else {
-            System.out.println("Saldo insuficiente na Poupança.");
+        if (valor <= 0) {
+            throw new IllegalArgumentException("Valor de saque deve ser positivo.");
         }
+        if (valor > saldo) {
+            throw new SaldoInsuficienteException(
+                "Saldo insuficiente na Poupança. Saldo atual: R$ " + String.format("%.2f", saldo));
+        }
+        saldo -= valor;
     }
 
+    /**
+     * Aplica rendimento percentual ao saldo atual.
+     *
+     * @param taxa percentual em decimal (ex: 0.015 = 1.5%)
+     */
     public void aplicarRendimento(double taxa) {
-        if (taxa > 0) {
-            double rendimento = saldo * taxa;
-            saldo += rendimento;
-            System.out.println("Rendimento de R$ " + rendimento + " aplicado (Taxa: " + (taxa * 100) + "%).");
-            System.out.println("Novo saldo: R$ " + saldo);
-        } else {
-            System.out.println("Taxa de rendimento inválida.");
+        if (taxa <= 0) {
+            throw new IllegalArgumentException("Taxa de rendimento deve ser positiva. Taxa informada: " + taxa);
         }
+        double rendimento = saldo * taxa;
+        saldo += rendimento;
     }
 
     @Override
-    public void mostrarDados() {
-        System.out.println("Tipo: Conta Poupança");
-        super.mostrarDados();
+    public String mostrarDados() {
+        return super.mostrarDados() + " | Tipo: Poupança";
     }
 }

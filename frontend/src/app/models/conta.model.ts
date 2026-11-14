@@ -12,7 +12,7 @@ export interface CriarContaRequest {
   nome: string;
   cpf: string;
   numero: number;
-  tipo: number;
+  tipo: string;
   limite: number;
 }
 

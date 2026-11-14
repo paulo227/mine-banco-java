@@ -1,5 +1,11 @@
 package model;
 
+import exception.SaldoInsuficienteException;
+
+/**
+ * Classe abstrata que representa uma conta bancária genérica.
+ * Contém as operações comuns a todos os tipos de conta.
+ */
 public abstract class Conta {
 
     private int numeroConta;
@@ -24,47 +30,51 @@ public abstract class Conta {
         return cliente;
     }
 
-    public void depositar(double valor) {
-
-        if (valor > 0) {
-
-            saldo += valor;
-
-            System.out.println("Depósito realizado.");
-            System.out.println("Saldo atual: R$ " + saldo);
-
-        } else {
-            System.out.println("Valor inválido.");
-        }
-    }
-
     public void setSaldo(double saldo) {
         this.saldo = saldo;
     }
 
-    public abstract void sacar(double valor);
-
-    public void transferir(Conta destino, double valor) {
-
-        if (valor <= saldo) {
-
-            saldo -= valor;
-            destino.saldo += valor;
-
-            System.out.println("Transferência realizada.");
-
-        } else {
-            System.out.println("Saldo insuficiente.");
+    /**
+     * Deposita um valor na conta.
+     * @param valor deve ser positivo
+     * @throws IllegalArgumentException se o valor for inválido
+     */
+    public void depositar(double valor) {
+        if (valor <= 0) {
+            throw new IllegalArgumentException("Valor de depósito deve ser positivo. Valor informado: " + valor);
         }
-
+        saldo += valor;
     }
 
+    /**
+     * Realiza saque da conta. Implementação varia por tipo de conta.
+     * @param valor deve ser positivo
+     */
+    public abstract void sacar(double valor);
 
-    public void mostrarDados() {
+    /**
+     * Transfere um valor desta conta para outra.
+     * @param destino conta de destino
+     * @param valor   valor a transferir
+     * @throws SaldoInsuficienteException se não houver saldo disponível
+     */
+    public void transferir(Conta destino, double valor) {
+        if (valor <= 0) {
+            throw new IllegalArgumentException("Valor de transferência deve ser positivo.");
+        }
+        if (valor > saldo) {
+            throw new SaldoInsuficienteException("Saldo insuficiente para transferência. Saldo: R$ " + saldo);
+        }
+        saldo -= valor;
+        destino.saldo += valor;
+    }
 
-        System.out.println("Conta: " + numeroConta);
-        System.out.println("Cliente: " + cliente.getNome());
-        System.out.println("Saldo: R$ " + saldo);
-
+    /**
+     * Retorna uma representação em texto dos dados da conta para logs/console.
+     */
+    public String mostrarDados() {
+        return "Conta: " + numeroConta +
+               " | Cliente: " + cliente.getNome() +
+               " | Saldo: R$ " + String.format("%.2f", saldo);
     }
 }

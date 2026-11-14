@@ -1,93 +1,94 @@
 .navbar {
-  height: 64px;
+  height: 68px;
   background: var(--navbar-bg);
   border-bottom: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
   padding: 0 24px;
   position: sticky;
   top: 0;
   z-index: 100;
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(14px);
 }
 
 .navbar-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
+  min-width: 0;
 }
 
 .menu-btn {
   display: none;
-  background: none;
-  border: none;
+  background: transparent;
+  border: 1px solid transparent;
   color: var(--text-primary);
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
   cursor: pointer;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
+  transition: background var(--transition), border-color var(--transition);
 }
 
 .menu-btn:hover {
   background: var(--bg-hover);
+  border-color: var(--border-color);
 }
 
 .breadcrumb {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
 }
 
 .breadcrumb-item {
   color: var(--text-primary);
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .navbar-right {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
-.icon-btn {
-  position: relative;
-  background: none;
-  border: none;
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-elevated);
   color: var(--text-secondary);
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background var(--transition), color var(--transition), border-color var(--transition),
+    transform var(--transition);
 }
 
-.icon-btn:hover {
-  background: var(--bg-hover);
+.theme-toggle:hover {
   color: var(--primary);
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  transform: translateY(-1px);
 }
 
-.badge {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  background: var(--danger);
-  color: #fff;
-  font-size: 10px;
-  font-weight: 700;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.theme-toggle mat-icon {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
 }
 
 .user-info {
@@ -95,24 +96,22 @@
   align-items: center;
   gap: 12px;
   padding: 4px 12px 4px 4px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.user-info:hover {
-  background: var(--bg-hover);
+  border-radius: 12px;
+  border-left: 1px solid var(--border-color);
+  padding-left: 16px;
 }
 
 .user-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
   background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: var(--on-primary);
+  flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
 }
 
 .user-avatar mat-icon {
@@ -124,31 +123,48 @@
 .user-details {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .user-name {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 650;
   color: var(--text-primary);
-  line-height: 1.2;
+  line-height: 1.25;
 }
 
 .user-role {
   font-size: 12px;
   color: var(--text-secondary);
-  line-height: 1.2;
+  line-height: 1.25;
+}
+
+@media (max-width: 900px) {
+  .user-details {
+    display: none;
+  }
+
+  .user-info {
+    padding-left: 12px;
+  }
 }
 
 @media (max-width: 768px) {
   .menu-btn {
-    display: flex;
+    display: inline-flex;
   }
 
   .navbar {
     padding: 0 16px;
   }
+}
 
-  .user-details {
+@media (max-width: 420px) {
+  .breadcrumb-item {
+    font-size: 16px;
+  }
+
+  .user-info {
     display: none;
   }
 }

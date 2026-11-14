@@ -1,13 +1,35 @@
 <!doctype html>
-<html lang="pt-BR" style="--primary: #4f46e5;">
+<html lang="pt-BR">
 <head>
   <meta charset="utf-8">
   <title>MineBanco</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="MineBanco - sistema bancário de estudo com gestão de contas, operações e relatórios.">
+  <meta name="theme-color" content="#f6f8fc">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script>
+    (function () {
+      try {
+        var key = 'minebanco-theme';
+        var stored = localStorage.getItem(key);
+        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var dark = stored === 'dark' || (stored !== 'light' && prefersDark);
+        var root = document.documentElement;
+        root.classList.toggle('dark-theme', dark);
+        root.dataset.theme = dark ? 'dark' : 'light';
+        root.style.colorScheme = dark ? 'dark' : 'light';
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) {
+          meta.setAttribute('content', dark ? '#0b1120' : '#f6f8fc');
+        }
+      } catch (e) {
+        /* preferências indisponíveis: segue o tema claro */
+      }
+    })();
+  </script>
 </head>
 <body class="mat-typography">
   <app-root></app-root>

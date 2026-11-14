@@ -1,11 +1,15 @@
 package controller.dto;
 
+import jakarta.validation.constraints.Positive;
+
+/**
+ * Request para operações de depósito e saque.
+ */
 public class OperacaoRequest {
-    private int numero;
+
+    @Positive(message = "O valor da operação deve ser positivo.")
     private double valor;
 
-    public int getNumero() { return numero; }
-    public void setNumero(int numero) { this.numero = numero; }
     public double getValor() { return valor; }
     public void setValor(double valor) { this.valor = valor; }
 }

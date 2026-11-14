@@ -11,33 +11,37 @@ import { ContaResponse } from '../models/conta.model';
   standalone: true,
   imports: [CommonModule, MatButtonModule, MatIconModule, MatSnackBarModule],
   template: `
-    <div class="page-container">
-      <div class="page-header">
+    <div class="page">
+      <header class="page-header">
         <div>
-          <h1>Contas Cadastradas</h1>
-          <p class="page-subtitle">{{ contas.length }} conta(s) encontrada(s)</p>
+          <h1 class="page-title">Contas cadastradas</h1>
+          <p class="page-subtitle" aria-live="polite">{{ contas.length }} conta(s) encontrada(s)</p>
         </div>
-        <button mat-stroked-button color="primary" (click)="carregar()" [disabled]="loading">
-          <mat-icon>refresh</mat-icon>
+        <button mat-stroked-button color="primary" type="button" (click)="carregar()" [disabled]="loading">
+          <mat-icon aria-hidden="true">refresh</mat-icon>
           Atualizar
         </button>
+      </header>
+
+      <div *ngIf="loading" class="loading" role="status" aria-live="polite">
+        <mat-icon class="spin" aria-hidden="true">refresh</mat-icon>
+        <span>Carregando contas...</span>
       </div>
 
-      <div *ngIf="loading" class="loading">
-        <mat-icon class="spin">refresh</mat-icon>
-        Carregando...
-      </div>
-
-      <div *ngIf="!loading && contas.length === 0" class="empty">
-        <mat-icon>account_balance_wallet</mat-icon>
+      <div *ngIf="!loading && contas.length === 0" class="empty" role="status">
+        <mat-icon aria-hidden="true">account_balance_wallet</mat-icon>
         <p>Nenhuma conta cadastrada.</p>
       </div>
 
-      <div class="card-grid" *ngIf="!loading">
-        <div *ngFor="let c of contas" class="conta-card" [class.poupanca]="c.tipo === 'POUPANCA'">
+      <div class="card-grid" *ngIf="!loading" aria-label="Lista de contas">
+        <article
+          *ngFor="let c of contas"
+          class="conta-card surface-card"
+          [class.poupanca]="c.tipo === 'POUPANCA'"
+        >
           <div class="card-top">
             <span class="tipo-badge" [class.corrente]="c.tipo === 'CORRENTE'" [class.poupanca]="c.tipo === 'POUPANCA'">
-              <mat-icon>{{ c.tipo === 'CORRENTE' ? 'account_balance' : 'savings' }}</mat-icon>
+              <mat-icon aria-hidden="true">{{ c.tipo === 'CORRENTE' ? 'account_balance' : 'savings' }}</mat-icon>
               {{ c.tipo }}
             </span>
             <span class="numero">#{{ c.numero }}</span>
@@ -45,59 +49,40 @@ import { ContaResponse } from '../models/conta.model';
 
           <div class="card-body">
             <div class="info-row">
-              <mat-icon>person</mat-icon>
-              <span>{{ c.clienteNome }} (CPF: {{ c.clienteCpf }})</span>
+              <mat-icon aria-hidden="true">person</mat-icon>
+              <span>{{ c.clienteNome }} <span class="cpf">(CPF: {{ c.clienteCpf }})</span></span>
             </div>
             <div class="info-row">
-              <mat-icon>payments</mat-icon>
-              <span><strong>Saldo:</strong> R$ {{ c.saldo | number:'1.2-2' }}</span>
+              <mat-icon aria-hidden="true">payments</mat-icon>
+              <span><strong>Saldo:</strong> {{ c.saldo | currency:'BRL' }}</span>
             </div>
             <div class="info-row" *ngIf="c.tipo === 'CORRENTE'">
-              <mat-icon>credit_card</mat-icon>
-              <span><strong>Limite:</strong> R$ {{ c.limite | number:'1.2-2' }}</span>
+              <mat-icon aria-hidden="true">credit_card</mat-icon>
+              <span><strong>Limite:</strong> {{ c.limite | currency:'BRL' }}</span>
             </div>
             <div class="info-row">
-              <mat-icon>receipt</mat-icon>
-              <span><strong>Imposto:</strong> R$ {{ c.imposto | number:'1.2-2' }}</span>
+              <mat-icon aria-hidden="true">receipt</mat-icon>
+              <span><strong>Imposto:</strong> {{ c.imposto | currency:'BRL' }}</span>
             </div>
           </div>
 
           <div class="card-actions">
-            <button class="btn-delete" (click)="confirmarExclusao(c)" [disabled]="deletando === c.numero">
-              <mat-icon>delete</mat-icon>
-              <span>{{ deletando === c.numero ? 'Excluindo...' : 'Excluir' }}</span>
+            <button
+              class="btn-delete"
+              type="button"
+              (click)="confirmarExclusao(c)"
+              [disabled]="deletando === c.numero"
+              [attr.aria-label]="'Excluir conta número ' + c.numero + ' de ' + c.clienteNome"
+            >
+              <mat-icon aria-hidden="true">delete</mat-icon>
+              <span>{{ deletando === c.numero ? 'Excluindo...' : 'Excluir conta' }}</span>
             </button>
           </div>
-        </div>
+        </article>
       </div>
     </div>
   `,
   styles: [`
-    .page-container {
-      padding: 24px;
-      max-width: 1200px;
-    }
-
-    .page-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-    }
-
-    .page-header h1 {
-      margin: 0;
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-
-    .page-subtitle {
-      margin: 4px 0 0;
-      font-size: 14px;
-      color: var(--text-secondary);
-    }
-
     .loading, .empty {
       display: flex;
       flex-direction: column;
@@ -124,16 +109,13 @@ import { ContaResponse } from '../models/conta.model';
     .card-grid {
       display: grid;
       gap: 20px;
-      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
     }
 
     .conta-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
       padding: 20px;
       border-left: 4px solid var(--primary);
-      transition: all 0.3s ease;
+      transition: transform var(--transition), box-shadow var(--transition);
     }
 
     .conta-card:hover {
@@ -149,6 +131,7 @@ import { ContaResponse } from '../models/conta.model';
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 12px;
       margin-bottom: 16px;
     }
 
@@ -156,12 +139,12 @@ import { ContaResponse } from '../models/conta.model';
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 6px 14px;
-      border-radius: 20px;
+      padding: 6px 12px;
+      border-radius: 999px;
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 650;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.4px;
     }
 
     .tipo-badge mat-icon {
@@ -171,19 +154,20 @@ import { ContaResponse } from '../models/conta.model';
     }
 
     .tipo-badge.corrente {
-      background: #eef2ff;
+      background: var(--primary-soft);
       color: var(--primary);
     }
 
     .tipo-badge.poupanca {
-      background: #ecfdf5;
-      color: var(--success);
+      background: var(--success-soft);
+      color: var(--success-text);
     }
 
     .numero {
       font-size: 20px;
-      font-weight: 700;
+      font-weight: 750;
       color: var(--text-primary);
+      letter-spacing: -0.01em;
     }
 
     .card-body {
@@ -196,16 +180,23 @@ import { ContaResponse } from '../models/conta.model';
 
     .info-row {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 10px;
       font-size: 14px;
       color: var(--text-primary);
+      min-width: 0;
     }
 
     .info-row mat-icon {
       font-size: 18px;
       width: 18px;
       height: 18px;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .cpf {
       color: var(--text-secondary);
     }
 
@@ -217,23 +208,24 @@ import { ContaResponse } from '../models/conta.model';
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 8px 16px;
-      border: 1px solid #fecaca;
-      background: #fef2f2;
+      padding: 9px 16px;
+      border: 1px solid var(--danger-border);
+      background: var(--danger-soft);
       color: var(--danger);
       border-radius: 10px;
       font-size: 13px;
-      font-weight: 500;
+      font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: background var(--transition), border-color var(--transition);
       font-family: inherit;
       width: 100%;
       justify-content: center;
     }
 
     .btn-delete:hover:not(:disabled) {
-      background: #fee2e2;
+      background: var(--danger);
       border-color: var(--danger);
+      color: #ffffff;
     }
 
     .btn-delete:disabled {
@@ -245,6 +237,12 @@ import { ContaResponse } from '../models/conta.model';
       font-size: 18px;
       width: 18px;
       height: 18px;
+    }
+
+    @media (max-width: 480px) {
+      .card-grid {
+        grid-template-columns: 1fr;
+      }
     }
   `]
 })

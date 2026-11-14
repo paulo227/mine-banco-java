@@ -1,0 +1,46 @@
+version: '3.9'
+
+services:
+  # -------------------------------------------------------
+  # PostgreSQL
+  # -------------------------------------------------------
+  db:
+    image: postgres:16-alpine
+    container_name: minebanco-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: minebanco
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - minebanco_data:/var/lib/postgresql/data
+      - ./banco.sql:/docker-entrypoint-initdb.d/banco.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d minebanco"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # -------------------------------------------------------
+  # Spring Boot API
+  # -------------------------------------------------------
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: minebanco-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/minebanco
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    ports:
+      - "8081:8081"
+
+volumes:
+  minebanco_data:

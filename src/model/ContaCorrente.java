@@ -1,5 +1,11 @@
 package model;
 
+import exception.SaldoInsuficienteException;
+
+/**
+ * Conta Corrente com limite de crédito e taxa de saque.
+ * Implementa Tributavel: paga 1% de imposto sobre saldo positivo.
+ */
 public class ContaCorrente extends Conta implements Tributavel {
 
     private double limite;
@@ -7,6 +13,9 @@ public class ContaCorrente extends Conta implements Tributavel {
 
     public ContaCorrente(int numeroConta, Cliente cliente, double limite) {
         super(numeroConta, cliente);
+        if (limite < 0) {
+            throw new IllegalArgumentException("Limite não pode ser negativo.");
+        }
         this.limite = limite;
     }
 
@@ -15,36 +24,45 @@ public class ContaCorrente extends Conta implements Tributavel {
     }
 
     public void setLimite(double limite) {
+        if (limite < 0) {
+            throw new IllegalArgumentException("Limite não pode ser negativo.");
+        }
         this.limite = limite;
     }
 
+    /**
+     * Realiza saque cobrando a taxa fixa de R$ 2,00.
+     * Permite usar o limite de crédito caso o saldo seja insuficiente.
+     *
+     * @param valor valor a sacar (sem a taxa)
+     * @throws SaldoInsuficienteException se saldo + limite não cobrirem valor + taxa
+     */
     @Override
     public void sacar(double valor) {
-        double valorTotal = valor + TAXA_SAQUE;
-
-        if (valorTotal <= (saldo + limite)) {
-            saldo -= valorTotal;
-            System.out.println("Saque realizado (taxa de R$ " + TAXA_SAQUE + " cobrada).");
-            System.out.println("Saldo atual: R$ " + saldo);
-        } else {
-            System.out.println("Saldo e limite insuficientes.");
+        if (valor <= 0) {
+            throw new IllegalArgumentException("Valor de saque deve ser positivo.");
         }
+        double valorTotal = valor + TAXA_SAQUE;
+        if (valorTotal > (saldo + limite)) {
+            throw new SaldoInsuficienteException(
+                "Saldo e limite insuficientes. Disponível: R$ " + String.format("%.2f", saldo + limite) +
+                ". Necessário (com taxa): R$ " + String.format("%.2f", valorTotal));
+        }
+        saldo -= valorTotal;
     }
 
+    /**
+     * Calcula 1% do saldo positivo como imposto de renda estimado.
+     */
     @Override
     public double calcularImposto() {
-        // Cobra 1% do saldo positivo como imposto
-        if (saldo > 0) {
-            return saldo * 0.01;
-        }
-        return 0.0;
+        return saldo > 0 ? saldo * 0.01 : 0.0;
     }
 
     @Override
-    public void mostrarDados() {
-        System.out.println("Tipo: Conta Corrente");
-        super.mostrarDados();
-        System.out.println("Limite: R$ " + limite);
-        System.out.println("Imposto Estimado (1%): R$ " + calcularImposto());
+    public String mostrarDados() {
+        return super.mostrarDados() +
+               " | Tipo: Corrente | Limite: R$ " + String.format("%.2f", limite) +
+               " | Imposto estimado: R$ " + String.format("%.2f", calcularImposto());
     }
 }

@@ -9,8 +9,9 @@
   margin-left: 260px;
   display: flex;
   flex-direction: column;
-  transition: margin-left 0.3s ease;
+  transition: margin-left 0.28s ease;
   min-height: 100vh;
+  min-width: 0;
 }
 
 .layout-main.sidebar-collapsed {
@@ -21,10 +22,30 @@
   flex: 1;
   background: var(--bg-page);
   overflow-y: auto;
+  outline: none;
+}
+
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  background: rgba(8, 12, 24, 0.55);
+  backdrop-filter: blur(2px);
+  animation: overlay-in 180ms ease both;
+}
+
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @media (max-width: 768px) {
-  .layout-main {
+  .layout-main,
+  .layout-main.sidebar-collapsed {
     margin-left: 0;
   }
 }

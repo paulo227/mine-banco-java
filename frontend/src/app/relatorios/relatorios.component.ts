@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
@@ -12,71 +11,146 @@ import { ContaService } from '../services/conta.service';
 @Component({
   selector: 'app-relatorios',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatCardModule, MatIconModule, MatSnackBarModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatSnackBarModule
+  ],
   template: `
-    <h2>Relatórios</h2>
+    <div class="page">
+      <header class="page-header">
+        <div>
+          <h1 class="page-title">Relatórios</h1>
+          <p class="page-subtitle">Aplique rendimento e acompanhe os impostos arrecadados.</p>
+        </div>
+      </header>
 
-    <div class="rel-grid">
-      <mat-card appearance="outlined">
-        <mat-card-header>
-          <mat-icon mat-card-avatar>trending_up</mat-icon>
-          <mat-card-title>Aplicar Rendimento (Poupança)</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <form [formGroup]="formRendimento" (ngSubmit)="onAplicarRendimento()">
+      <div class="rel-grid">
+        <section class="rel-card surface-card" aria-labelledby="rendimento-title">
+          <div class="rel-card-header">
+            <span class="rel-icon success" aria-hidden="true">
+              <mat-icon aria-hidden="true">trending_up</mat-icon>
+            </span>
+            <div class="rel-title-wrap">
+              <h2 id="rendimento-title">Aplicar rendimento</h2>
+              <p class="rel-desc">Rendimento para contas poupança.</p>
+            </div>
+          </div>
+
+          <form [formGroup]="formRendimento" (ngSubmit)="onAplicarRendimento()" novalidate>
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Taxa (ex: 0.01 = 1%)</mat-label>
-              <input matInput type="number" formControlName="taxa" step="0.0001" required>
-              <mat-hint>Percentual em decimal. Ex: 0.01 para 1%</mat-hint>
+              <mat-label>Taxa</mat-label>
+              <input matInput type="number" formControlName="taxa" step="0.0001" min="0" inputmode="decimal" required>
+              <mat-hint>Percentual em decimal. Ex.: 0,01 para 1%</mat-hint>
             </mat-form-field>
-            <button mat-raised-button color="primary" type="submit" [disabled]="formRendimento.invalid || loadingRend">
-              {{ loadingRend ? 'Aplicando...' : 'Aplicar Rendimento' }}
+            <button mat-flat-button color="primary" type="submit" class="submit-btn" [disabled]="formRendimento.invalid || loadingRend">
+              {{ loadingRend ? 'Aplicando...' : 'Aplicar rendimento' }}
             </button>
           </form>
-        </mat-card-content>
-      </mat-card>
+        </section>
 
-      <mat-card appearance="outlined">
-        <mat-card-header>
-          <mat-icon mat-card-avatar>receipt_long</mat-icon>
-          <mat-card-title>Total de Impostos</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <button mat-raised-button color="accent" (click)="onCalcularImpostos()" [disabled]="loadingImp">
-            <mat-icon>calculate</mat-icon>
-            {{ loadingImp ? 'Calculando...' : 'Calcular' }}
-          </button>
-          <div class="imposto-result" *ngIf="totalImpostos !== null">
-            <span class="label">Total de Impostos Arrecadados:</span>
-            <span class="valor">R$ {{ totalImpostos | number:'1.2-2' }}</span>
+        <section class="rel-card surface-card" aria-labelledby="impostos-title">
+          <div class="rel-card-header">
+            <span class="rel-icon warning" aria-hidden="true">
+              <mat-icon aria-hidden="true">receipt_long</mat-icon>
+            </span>
+            <div class="rel-title-wrap">
+              <h2 id="impostos-title">Total de impostos</h2>
+              <p class="rel-desc">Soma dos impostos de todas as contas.</p>
+            </div>
           </div>
-        </mat-card-content>
-      </mat-card>
+
+          <button mat-flat-button color="accent" type="button" class="submit-btn" (click)="onCalcularImpostos()" [disabled]="loadingImp">
+            <mat-icon aria-hidden="true">calculate</mat-icon>
+            {{ loadingImp ? 'Calculando...' : 'Calcular impostos' }}
+          </button>
+
+          <div class="imposto-result" *ngIf="totalImpostos !== null" role="status" aria-live="polite">
+            <span class="label">Total de impostos arrecadados</span>
+            <span class="valor">{{ totalImpostos | currency:'BRL' }}</span>
+          </div>
+        </section>
+      </div>
     </div>
   `,
   styles: [`
-    h2 {
-      margin: 0 0 20px;
-      color: #3f51b5;
-      font-weight: 500;
-    }
-
     .rel-grid {
       display: grid;
       gap: 20px;
-      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+
+    .rel-card {
+      padding: 22px;
+    }
+
+    .rel-card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .rel-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .rel-icon mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+
+    .rel-icon.success {
+      background: var(--success-soft);
+      color: var(--success-text);
+    }
+
+    .rel-icon.warning {
+      background: var(--warning-soft);
+      color: var(--warning-text);
+    }
+
+    .rel-title-wrap h2 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 650;
+      color: var(--text-primary);
+    }
+
+    .rel-desc {
+      margin: 2px 0 0;
+      font-size: 13px;
+      color: var(--text-secondary);
     }
 
     .full-width {
       width: 100%;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
+    }
+
+    .submit-btn {
+      min-height: 44px;
+      padding: 0 24px;
+      margin-top: 8px;
     }
 
     .imposto-result {
       margin-top: 20px;
-      padding: 16px;
-      background: #e8f5e9;
-      border-radius: 8px;
+      padding: 16px 18px;
+      background: var(--success-soft);
+      border: 1px solid var(--success);
+      border-radius: 12px;
       display: flex;
       flex-direction: column;
       gap: 4px;
@@ -84,13 +158,24 @@ import { ContaService } from '../services/conta.service';
 
     .label {
       font-size: 13px;
-      color: #555;
+      color: var(--text-secondary);
     }
 
     .valor {
       font-size: 28px;
-      font-weight: 700;
-      color: #2e7d32;
+      font-weight: 750;
+      color: var(--success-text);
+      letter-spacing: -0.02em;
+    }
+
+    @media (max-width: 640px) {
+      .rel-card {
+        padding: 18px;
+      }
+
+      .submit-btn {
+        width: 100%;
+      }
     }
   `]
 })
