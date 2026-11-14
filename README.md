@@ -1,85 +1,93 @@
 # MineBanco
 
-Sistema bancário de estudo em **Java 21 + Spring Boot 3.3 + PostgreSQL + Angular 17**.
+Sistema bancário de estudo: back-end em **Java 21 + Spring Boot 3.3.5 + PostgreSQL** e front-end em **Angular 17 + Material**.
 
-> Projeto educacional, sem autenticação/autorização. Não use em produção ou exposto publicamente sem antes implementar segurança.
+> Projeto educacional. Não possui autenticação/autorização; não use em produção.
 
-## Pré-requisitos
+## Stack
 
-- JDK 21
-- Maven 3.9+
-- PostgreSQL 16 (ou Docker)
-- Node.js 18.13+ / 20+ (apenas para o frontend)
+- **Back-end:** Java 21, Spring Boot (Web, JDBC, Validation), JDBC puro com DAO, HikariCP, PostgreSQL, springdoc/Swagger.
+- **Front-end:** Angular 17 standalone, Angular Material, tema claro/escuro e acessibilidade.
+- **Build:** Maven 3.9+; testes com JUnit 5.
+- **Infra:** Docker multi-stage + Docker Compose (PostgreSQL 16 + API).
 
-## Banco de dados
+## Como rodar
 
-Crie o banco e as tabelas:
+Pré-requisitos: JDK 21, Maven, PostgreSQL 16+ (ou Docker) e Node 18+ para o front-end.
 
 ```bash
+# 1. Banco local
 createdb minebanco
 psql -d minebanco -f banco.sql
+
+# 2. API (http://localhost:8081)
+mvn spring-boot:run
+
+# 3. Front-end em dev (http://localhost:4200, proxy para 8081)
+cd frontend
+npm install
+npm start
 ```
 
-Configuração padrão (pode ser sobrescrita por variáveis de ambiente):
+Ou com Docker: `docker compose up --build`.
+
+Para servir a SPA pelo back-end, rode `npm run build` em `frontend/` antes de iniciar/empacotar a API; o build vai para `src/main/resources/static`.
+
+Configuração do banco (variáveis de ambiente):
 
 | Variável | Padrão |
-|----------|--------|
+|---|---|
 | `DB_URL` | `jdbc:postgresql://localhost:5432/minebanco` |
 | `DB_USER` | `postgres` |
 | `DB_PASSWORD` | `postgres` |
 
-## Executar
+As tabelas (`cliente`, `conta`, `transacao`) também são criadas automaticamente na inicialização.
 
-```cmd
-executar.bat spring    → API em http://localhost:8081
-executar.bat frontend  → Angular dev em http://localhost:4200 (faz proxy de /api para 8081)
-executar.bat test      → testes unitários (JUnit 5)
-executar.bat build     → build completo do backend
-```
-
-Ou com Docker (sobe PostgreSQL + API):
-
-```bash
-docker compose up --build
-```
-
-### Servir o frontend pelo backend
-
-O Angular compila direto para `src/main/resources/static`:
-
-```bash
-cd frontend
-npm install
-npm run build
-```
-
-Depois inicie o backend (`executar.bat spring`) e acesse http://localhost:8081.
-
-- Swagger UI: http://localhost:8081/swagger-ui.html
-- OpenAPI JSON: http://localhost:8081/api-docs
+- Swagger UI: `http://localhost:8081/swagger-ui.html`
+- OpenAPI: `http://localhost:8081/api-docs`
 
 ## API
 
-| Método | Rota | Função |
-|--------|------|--------|
-| GET | `/api/contas` | Listar |
-| GET | `/api/contas/{n}` | Buscar |
-| POST | `/api/contas` | Criar |
-| POST | `/api/contas/{n}/deposito` | Depositar |
-| POST | `/api/contas/{n}/saque` | Sacar |
-| POST | `/api/contas/transferencia` | Transferir |
-| POST | `/api/contas/rendimento` | Rendimento |
-| GET | `/api/contas/impostos` | Impostos |
-| DELETE | `/api/contas/{n}` | Excluir (saldo zerado) |
+Base: `/api/contas`
+
+| Método | Rota | Ação |
+|---|---|---|
+| `GET` | `/api/contas?page=0&size=20` | Lista contas |
+| `GET` | `/api/contas/{n}` | Busca conta |
+| `POST` | `/api/contas` | Cria conta |
+| `DELETE` | `/api/contas/{n}` | Exclui (saldo zero) |
+| `POST` | `/api/contas/{n}/deposito` | Deposita |
+| `POST` | `/api/contas/{n}/saque` | Saca |
+| `POST` | `/api/contas/transferencia` | Transfere |
+| `POST` | `/api/contas/rendimento` | Rendimento nas poupanças |
+| `GET` | `/api/contas/impostos` | Total de impostos |
+| `GET` | `/api/contas/{n}/extrato` | Extrato |
+
+## Regras principais
+
+- **Conta corrente:** taxa de saque de R$ 2,00, pode usar limite e paga 1% de imposto sobre saldo positivo.
+- **Poupança:** sem limite, não permite saldo negativo, não paga imposto e aceita rendimento.
+- Transferência usa apenas saldo (não o limite) e é gravada de forma atômica.
+- Exclusão só com saldo exatamente zero.
+- CPF é único; se já existir, o cliente é reutilizado.
 
 ## Estrutura
 
 ```
-src/               → Backend (Java: controller, model, service, util)
-frontend/src/app/  → Frontend (Angular: layout, páginas, services, models)
+src/                    # Back-end (app, controller, service, model, util, exception)
+src/test/               # Testes JUnit 5
+frontend/src/app/       # Telas, layout, serviços e modelos Angular
+banco.sql               # Schema do banco
+Dockerfile / docker-compose.yml
 ```
 
-## Stack
+## Limitações
 
-**Backend:** Java 21, Spring Boot 3.3.5, PostgreSQL, HikariCP, Maven  
-**Frontend:** Angular 17, Angular Material, CSS Grid/Flexbox, responsivo
+- Sem login, perfis ou proteção dos endpoints.
+- Dinheiro usa `double` no Java (o banco usa `DECIMAL`).
+- Sem migrations; schema definido em `banco.sql` e recriado pelo `DatabaseManager`.
+- Transferência não grava saldo e histórico na mesma transação SQL.
+- Layout Maven não padrão (`src` como source root), com JUnit em escopo `compile`.
+- Sem fallback de rotas da SPA quando servida pelo Spring; recarregar `/dashboard` pode dar 404.
+
+Testes: `mvn test` (ou `executar.bat test`).
